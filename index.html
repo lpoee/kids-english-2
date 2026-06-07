@@ -45,8 +45,6 @@ button:focus-visible,#video-card:focus-visible,#word-text:focus-visible{outline:
 #arrow-right{right:0}
 #counter{color:rgba(255,255,255,.36);font-size:12px;flex-shrink:0;cursor:default;padding:6px 16px;border-radius:14px;margin-top:2px;z-index:10}
 #counter span{color:#ffd700;font-weight:800;font-size:15px}
-#version{color:rgba(255,255,255,.24);font-size:11px;font-weight:800;margin-bottom:2px}
-#hint{color:rgba(255,255,255,.32);font-size:11px;margin-bottom:3px;text-align:center}
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(130%);background:rgba(255,255,255,.92);color:#102030;border-radius:16px;padding:10px 14px;font-size:14px;font-weight:800;z-index:50;transition:transform .18s;box-shadow:0 12px 32px rgba(0,0,0,.28)}
 #toast.show{transform:translateX(-50%) translateY(0)}
 #error{min-height:100%;display:grid;place-items:center;padding:20px;color:#fecaca;font-weight:800;text-align:center}
@@ -80,11 +78,9 @@ button:focus-visible,#video-card:focus-visible,#word-text:focus-visible{outline:
     <div id="cn-text"></div>
     <button class="arrow" id="arrow-right" aria-label="Next card">▶</button>
   </div>
-  <div id="hint">Tap the card or word to hear English, then Chinese.</div>
   <div id="counter"><span id="idx-num">1</span> / <span id="total-num">10</span></div>
-  <div id="version">Kids English 2.0</div>
 </div>
-<div id="toast">Playing English, then Chinese</div>
+<div id="toast">▶</div>
 <script>
 const state = {cards: [], index: 0, audio: null, cnTimer: null, toastTimer: null, playbackId: 0};
 const $ = id => document.getElementById(id);

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Kids English 2.0</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff7e8;color:#172033}
+body{overflow-x:hidden}
+button{font:inherit}
+.app{min-height:100vh;display:grid;grid-template-columns:280px minmax(0,1fr);background:linear-gradient(135deg,#fff7e8 0%,#dff4ff 46%,#e9f8df 100%)}
+.rail{padding:18px;border-right:1px solid rgba(23,32,51,.12);background:rgba(255,255,255,.72);backdrop-filter:blur(18px);display:flex;flex-direction:column;gap:16px;min-height:100vh}
+.brand{display:flex;align-items:center;gap:10px;font-weight:850;font-size:18px;color:#172033}
+.brand-mark{width:34px;height:34px;border-radius:8px;background:#ffcf4a;display:grid;place-items:center;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.meta div{border:1px solid rgba(23,32,51,.1);background:#fff;border-radius:8px;padding:10px}
+.meta strong{display:block;font-size:18px;line-height:1}
+.meta span{font-size:12px;color:#647089}
+.list{display:flex;flex-direction:column;gap:8px;overflow:auto;padding-right:4px}
+.card-tab{border:1px solid rgba(23,32,51,.11);background:#fff;border-radius:8px;padding:10px 12px;text-align:left;cursor:pointer;display:grid;gap:2px;color:#172033;transition:transform .12s,border-color .12s,background .12s}
+.card-tab:hover{transform:translateY(-1px);border-color:#3182ce}
+.card-tab.active{background:#172033;color:#fff;border-color:#172033}
+.card-tab small{color:#647089;font-size:12px}
+.card-tab.active small{color:#c8d4e8}
+.stage{min-height:100vh;padding:22px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.title h1{margin:0;font-size:clamp(24px,4vw,42px);line-height:1;letter-spacing:0}
+.title p{margin:8px 0 0;color:#536078;font-size:15px;line-height:1.35}
+.controls{display:flex;gap:8px;align-items:center}
+.icon-btn{width:44px;height:44px;border-radius:8px;border:1px solid rgba(23,32,51,.14);background:#fff;cursor:pointer;display:grid;place-items:center;color:#172033}
+.icon-btn:active{transform:scale(.96)}
+.viewer{display:grid;grid-template-columns:minmax(280px,1fr) 360px;gap:18px;min-height:0;align-items:stretch}
+.video-card{border-radius:8px;background:#101827;position:relative;overflow:hidden;box-shadow:0 26px 60px rgba(23,32,51,.22);min-height:360px;display:grid}
+video{width:100%;height:100%;object-fit:cover;display:block;background:#101827}
+.video-card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.72));pointer-events:none}
+.phrase{position:absolute;left:22px;right:22px;bottom:18px;z-index:1;color:#fff;display:grid;gap:8px}
+.phrase .en{font-size:clamp(42px,7vw,86px);font-weight:900;line-height:.96;letter-spacing:0;text-shadow:0 4px 18px rgba(0,0,0,.42)}
+.phrase .cn{font-size:clamp(24px,4vw,42px);font-weight:800;text-shadow:0 3px 12px rgba(0,0,0,.38)}
+.play-ring{position:absolute;top:18px;right:18px;width:54px;height:54px;border-radius:50%;border:2px solid rgba(255,255,255,.78);background:rgba(255,255,255,.14);color:#fff;z-index:2;display:grid;place-items:center;font-size:22px;backdrop-filter:blur(6px)}
+.detail{border:1px solid rgba(23,32,51,.12);border-radius:8px;background:rgba(255,255,255,.82);padding:16px;display:flex;flex-direction:column;gap:14px;min-height:0}
+.detail h2{margin:0;font-size:26px;line-height:1.08;letter-spacing:0}
+.detail .translation{font-size:22px;font-weight:800;color:#2f6f48}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:#edf5ff;border:1px solid #cfe6ff;color:#214a78;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:750}
+.prompt{overflow:auto;border:1px solid rgba(23,32,51,.1);background:#fff;border-radius:8px;padding:12px;font-size:13px;line-height:1.45;color:#42506a}
+.prompt b{display:block;color:#172033;margin-bottom:6px}
+.footer{display:flex;align-items:center;justify-content:space-between;color:#536078;font-size:13px}
+.progress{height:10px;background:rgba(23,32,51,.12);border-radius:999px;overflow:hidden;flex:1;max-width:360px}
+.bar{height:100%;width:10%;background:#ffb629;border-radius:999px;transition:width .2s}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(120%);background:#172033;color:#fff;border-radius:8px;padding:10px 14px;font-size:14px;transition:transform .18s;z-index:20;box-shadow:0 12px 32px rgba(23,32,51,.22)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@media(max-width:860px){
+  .app{grid-template-columns:1fr}
+  .rail{min-height:auto;border-right:0;border-bottom:1px solid rgba(23,32,51,.12);padding:12px}
+  .list{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(150px,1fr);overflow-x:auto;padding-bottom:4px}
+  .stage{min-height:auto;padding:14px}
+  .topbar{align-items:flex-start}
+  .viewer{grid-template-columns:1fr}
+  .video-card{min-height:auto;aspect-ratio:3/2}
+  .detail{display:none}
+}
+@media(max-width:520px){
+  .controls{position:fixed;right:12px;bottom:12px;z-index:10;background:rgba(255,255,255,.78);padding:6px;border-radius:10px;box-shadow:0 10px 30px rgba(23,32,51,.16)}
+  .phrase{left:14px;right:14px;bottom:14px}
+  .play-ring{width:46px;height:46px;top:12px;right:12px}
+}
+</style>
+</head>
+<body>
+<main class="app">
+  <aside class="rail">
+    <div class="brand"><div class="brand-mark">2.0</div><span>Kids English</span></div>
+    <div class="meta">
+      <div><strong id="total-count">10</strong><span>phrase cards</span></div>
+      <div><strong>4-5</strong><span>age target</span></div>
+    </div>
+    <nav class="list" id="card-list" aria-label="Cards"></nav>
+  </aside>
+  <section class="stage">
+    <div class="topbar">
+      <div class="title">
+        <h1 id="page-title">Hello!</h1>
+        <p>Tap the video card to hear English first, then Chinese.</p>
+      </div>
+      <div class="controls">
+        <button class="icon-btn" id="prev" aria-label="Previous card">‹</button>
+        <button class="icon-btn" id="play" aria-label="Play audio">▶</button>
+        <button class="icon-btn" id="next" aria-label="Next card">›</button>
+      </div>
+    </div>
+    <div class="viewer">
+      <article class="video-card" id="tap-card" aria-label="Tap to play phrase audio">
+        <video id="video" muted loop playsinline preload="auto"></video>
+        <div class="play-ring" id="play-state">▶</div>
+        <div class="phrase">
+          <div class="en" id="phrase-en"></div>
+          <div class="cn" id="phrase-cn"></div>
+        </div>
+      </article>
+      <aside class="detail">
+        <h2 id="detail-en"></h2>
+        <div class="translation" id="detail-cn"></div>
+        <div class="chips">
+          <span class="chip" id="detail-category"></span>
+          <span class="chip">ComfyUI + LTX 2.3</span>
+          <span class="chip">English then Chinese</span>
+        </div>
+        <div class="prompt"><b>Video prompt</b><span id="detail-prompt"></span></div>
+        <div class="prompt"><b>Negative prompt</b><span id="detail-negative"></span></div>
+      </aside>
+    </div>
+    <div class="footer">
+      <span id="counter">1 / 10</span>
+      <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+      <span>LTX 2.3 workflows in <code>comfyui/workflows/kids-english-2</code></span>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast">Playing English, then Chinese</div>
+<script>
+const state = {cards: [], index: 0, audio: null, cnTimer: null};
+const $ = id => document.getElementById(id);
+
+async function loadCards() {
+  const response = await fetch('data/kids_english_2_cards.json?v=2');
+  if (!response.ok) throw new Error('Unable to load Kids English 2.0 card data');
+  const data = await response.json();
+  state.cards = data.cards;
+  $('total-count').textContent = data.cards.length;
+  renderList();
+  render();
+}
+
+function currentCard() {
+  return state.cards[state.index];
+}
+
+function renderList() {
+  $('card-list').innerHTML = state.cards.map((card, index) => `
+    <button class="card-tab${index === state.index ? ' active' : ''}" data-index="${index}">
+      <span>${index + 1}. ${card.english}</span>
+      <small>${card.chinese}</small>
+    </button>
+  `).join('');
+  $('card-list').querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', () => {
+      state.index = Number(button.dataset.index);
+      render();
+    });
+  });
+}
+
+function render() {
+  const card = currentCard();
+  if (!card) return;
+  const video = $('video');
+  video.poster = card.poster;
+  video.src = card.video + '?v=2';
+  video.play().catch(() => {});
+  $('page-title').textContent = card.english;
+  $('phrase-en').textContent = card.english;
+  $('phrase-cn').textContent = card.chinese;
+  $('detail-en').textContent = card.english;
+  $('detail-cn').textContent = card.chinese;
+  $('detail-category').textContent = card.category;
+  $('detail-prompt').textContent = card.prompt;
+  $('detail-negative').textContent = card.negative_prompt;
+  $('counter').textContent = `${state.index + 1} / ${state.cards.length}`;
+  $('bar').style.width = `${((state.index + 1) / state.cards.length) * 100}%`;
+  renderList();
+}
+
+function stopAudio() {
+  if (state.audio) {
+    state.audio.pause();
+    state.audio.currentTime = 0;
+    state.audio = null;
+  }
+  if (state.cnTimer) {
+    clearTimeout(state.cnTimer);
+    state.cnTimer = null;
+  }
+  $('play-state').textContent = '▶';
+}
+
+function playFile(path) {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio(path);
+    state.audio = audio;
+    audio.onended = resolve;
+    audio.onerror = reject;
+    audio.play().catch(reject);
+  });
+}
+
+async function playCard() {
+  const card = currentCard();
+  if (!card) return;
+  stopAudio();
+  showToast();
+  $('play-state').textContent = '●';
+  try {
+    await playFile(card.audio_en);
+    await new Promise(resolve => { state.cnTimer = setTimeout(resolve, 350); });
+    await playFile(card.audio_cn);
+  } catch (error) {
+    console.warn(error);
+  } finally {
+    state.audio = null;
+    $('play-state').textContent = '▶';
+  }
+}
+
+function showToast() {
+  const toast = $('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1200);
+}
+
+function move(delta) {
+  stopAudio();
+  state.index = (state.index + delta + state.cards.length) % state.cards.length;
+  render();
+}
+
+$('prev').addEventListener('click', () => move(-1));
+$('next').addEventListener('click', () => move(1));
+$('play').addEventListener('click', playCard);
+$('tap-card').addEventListener('click', playCard);
+document.addEventListener('keydown', event => {
+  if (event.key === 'ArrowLeft') move(-1);
+  if (event.key === 'ArrowRight') move(1);
+  if (event.key === ' ') {
+    event.preventDefault();
+    playCard();
+  }
+});
+loadCards().catch(error => {
+  document.body.innerHTML = `<pre style="padding:20px;color:#7f1d1d">${error.message}</pre>`;
+});
+</script>
+</body>
+</html>

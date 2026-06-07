@@ -122,7 +122,7 @@ video{width:100%;height:100%;object-fit:cover;display:block;background:#101827}
 </main>
 <div class="toast" id="toast">Playing English, then Chinese</div>
 <script>
-const state = {cards: [], index: 0, audio: null, cnTimer: null};
+const state = {cards: [], index: 0, audio: null, cnTimer: null, playbackId: 0};
 const $ = id => document.getElementById(id);
 
 async function loadCards() {
@@ -175,6 +175,7 @@ function render() {
 }
 
 function stopAudio() {
+  state.playbackId += 1;
   if (state.audio) {
     state.audio.pause();
     state.audio.currentTime = 0;
@@ -187,31 +188,53 @@ function stopAudio() {
   $('play-state').textContent = '▶';
 }
 
-function playFile(path) {
+function playFile(path, playbackId) {
   return new Promise((resolve, reject) => {
+    if (playbackId !== state.playbackId) {
+      reject(new Error('stale playback'));
+      return;
+    }
     const audio = new Audio(path);
     state.audio = audio;
-    audio.onended = resolve;
+    audio.onended = () => {
+      if (playbackId === state.playbackId) resolve();
+    };
     audio.onerror = reject;
     audio.play().catch(reject);
   });
 }
 
-async function playCard() {
+function waitForChinese(playbackId) {
+  return new Promise(resolve => {
+    state.cnTimer = setTimeout(() => {
+      state.cnTimer = null;
+      if (playbackId === state.playbackId) resolve();
+    }, 350);
+  });
+}
+
+async function playCard(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
   const card = currentCard();
   if (!card) return;
   stopAudio();
+  const playbackId = state.playbackId;
   showToast();
   $('play-state').textContent = '●';
   try {
-    await playFile(card.audio_en);
-    await new Promise(resolve => { state.cnTimer = setTimeout(resolve, 350); });
-    await playFile(card.audio_cn);
+    await playFile(card.audio_en, playbackId);
+    await waitForChinese(playbackId);
+    await playFile(card.audio_cn, playbackId);
   } catch (error) {
-    console.warn(error);
+    if (playbackId === state.playbackId) console.warn(error);
   } finally {
-    state.audio = null;
-    $('play-state').textContent = '▶';
+    if (playbackId === state.playbackId) {
+      state.audio = null;
+      $('play-state').textContent = '▶';
+    }
   }
 }
 
